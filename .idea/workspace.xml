@@ -7,13 +7,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a0e32c08-d83f-4483-b396-32ff9d893c97" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/WeatherCheckingTool/images/widget_沙.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/WeatherCheckingTool/images/widget_沙@2x.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/WeatherCheckingTool/images/widget_雪@2x.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/WeatherCheckingTool/images/widget_雾.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/WeatherCheckingTool/images/widget_雾@2x.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/WeatherCheckingTool/images/widget_风.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/WeatherCheckingTool/images/widget_风@2x.png" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/WeatherInfo.java" afterPath="$PROJECT_DIR$/src/WeatherInfo.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -29,12 +24,14 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="WeatherInfo.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="WeatherInfo.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/WeatherInfo.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="15" column="49" lean-forward="false" selection-start-line="15" selection-start-column="49" selection-end-line="15" selection-end-column="49" />
-              <folding />
+            <state relative-caret-position="291">
+              <caret line="49" column="122" lean-forward="false" selection-start-line="49" selection-start-column="122" selection-end-line="49" selection-end-column="122" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -68,7 +65,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="WeatherInterface.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="WeatherInterface.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/WeatherInterface.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="52">
@@ -173,8 +170,8 @@
         <option value="$PROJECT_DIR$/src/Weather.java" />
         <option value="$PROJECT_DIR$/src/IPHostInfo.java" />
         <option value="$PROJECT_DIR$/src/db/conditionCode" />
-        <option value="$PROJECT_DIR$/src/WeatherInfo.java" />
         <option value="$PROJECT_DIR$/src/WeatherInterface.java" />
+        <option value="$PROJECT_DIR$/src/WeatherInfo.java" />
       </list>
     </option>
   </component>
@@ -236,24 +233,6 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="WeatherCheckingTool" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IpRequest" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="WeatherCheckingTool" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="WeatherInterface.java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -776,12 +755,12 @@
       <workItem from="1510606260973" duration="274000" />
       <workItem from="1510791325498" duration="2464000" />
       <workItem from="1510793798802" duration="9732000" />
-      <workItem from="1510847668299" duration="721000" />
+      <workItem from="1510847668299" duration="1075000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="58745000" />
+    <option name="totallyTimeSpent" value="59099000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1108,14 +1087,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/WeatherInfo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="15" column="49" lean-forward="false" selection-start-line="15" selection-start-column="49" selection-end-line="15" selection-end-column="49" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/WeatherCheckingTool.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -1133,6 +1104,16 @@
             <element signature="method#setFrameSize#0;class#WeatherInterface#0" expanded="false" />
             <element signature="method#setDefaultCloseOperation#0;class#WeatherInterface#0" expanded="false" />
             <element signature="method#generateLabel#0;class#WeatherInterface#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/WeatherInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="291">
+          <caret line="49" column="122" lean-forward="false" selection-start-line="49" selection-start-column="122" selection-end-line="49" selection-end-column="122" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
