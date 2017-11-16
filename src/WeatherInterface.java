@@ -1,7 +1,17 @@
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * Created by shengliu on 8/27/17.
@@ -73,7 +83,10 @@ class JLabelFactory extends JLabel{
 
 }
 
-class WeatherInterface extends JFrame{
+class WeatherInterface extends JFrame implements ActionListener{
+private int MAX_LABELS = 11;
+private int iterator = 0;
+private JLabel[] labels = new JLabel[MAX_LABELS];
 
    WeatherInterface() throws Exception {
       try {
@@ -84,10 +97,10 @@ class WeatherInterface extends JFrame{
 
    }
 
-   public String[] createWeather() throws Exception{
+  private JSONArray queryLocalWeather() throws Exception {
    IPHostInfo ipPack = null;
    WeatherInfo weather = null;
-   String []   retResult = null;
+   JSONArray retResult = null;
 
       try {
          ipPack = new IPHostInfo();
@@ -97,29 +110,210 @@ class WeatherInterface extends JFrame{
          return retResult;
       }
         catch (Exception e){
-        throw new Exception(e);
+         throw new Exception(e);
       }
 
    }
 
-   public void createDefaultDisplayUI() throws Exception {
+   private String translateConditionCode(int code){
+
+      try {
+         String line = null;
+         FileReader conFileReader = new FileReader("src/db/conditionCode.txt");
+         BufferedReader contxt = new BufferedReader(conFileReader);
+
+         while((line = contxt.readLine()) != null){
+            String[] wholeLine = line.split("//");
+            if(Integer.parseInt(wholeLine[0]) == code){
+
+               System.out.println(wholeLine[1]);
+               return wholeLine[1];
+            }
+
+         }
+
+
+
+      } catch (FileNotFoundException e) {
+         e.printStackTrace();
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
+
+
+      return null;
+   }
+
+   private int getIterator(){
+
+      return iterator;
+   }
+
+   private JLabel[] getLabels(){
+
+      return labels;
+   }
+
+   private void increaseIterator(){
+
+      iterator++;
+   }
+
+   private void decreaseIterator(){
+
+      iterator--;
+   }
+
+   private void addWeatherLabels(JLabel label){
+
+      JLabel[] labels = getLabels();
+
+      if(getIterator() < MAX_LABELS){
+
+         labels[getIterator()] = label;
+         increaseIterator();
+      }
+   }
+
+   private JLabel queryIndividualWeathLabel(JSONObject weatherJSON){
+      ImageIcon weatherImg = null;
+      String iconMSG = null;
+      String date, high, low, txt;
+      JLabel label = null;
+      int conCode = 0;
+
+      try {
+         conCode = Integer.parseInt(weatherJSON.getString("code"));
+
+         if ((iconMSG = translateConditionCode(conCode)) != null) {
+            weatherImg = new ImageIcon("src/images/widget_" + iconMSG + ".png");
+
+         } else {
+            new Exception("Error! Unable to load icon! x140");
+         }
+
+
+         date = weatherJSON.getString("date");
+         high = weatherJSON.getString("high");
+         low = weatherJSON.getString("high");
+         txt = weatherJSON.getString("text");
+
+         label = new JLabel(date + " | High:" + high + " | low: " + low + " | " + txt, weatherImg, JLabel.LEFT);
+         return label;
+      }catch (JSONException e) {
+         e.printStackTrace();
+      }
+
+      return null;
+   }
+
+   private void changeIndivWeathLabel(JSONObject weatherJSON,JLabel label){
+      ImageIcon weatherImg = null;
+      String iconMSG = null;
+      String date, high, low, txt;
+      int conCode = 0;
+
+      try {
+         conCode = Integer.parseInt(weatherJSON.getString("code"));
+
+         if ((iconMSG = translateConditionCode(conCode)) != null) {
+            weatherImg = new ImageIcon("src/images/widget_" + iconMSG + ".png");
+
+         } else {
+            new Exception("Error! Unable to load icon! x140");
+         }
+
+
+         date = weatherJSON.getString("date");
+         high = weatherJSON.getString("high");
+         low = weatherJSON.getString("high");
+         txt = weatherJSON.getString("text");
+
+         label.setText(date + " | High:" + high + " | low: " + low + " | " + txt);
+
+      }catch (JSONException e) {
+         e.printStackTrace();
+      }
+   }
+
+   private void refreshWeatherPanel(JSONArray arr){
+      ImageIcon weatherImg = null;
+      String iconMSG = null;
+      JSONObject weatherJSON = null;
+      String date, high, low, txt;
+      JLabel label = null;
+      try {
+         for (int i = 0; i < arr.length(); i++) {
+            weatherJSON = arr.getJSONObject(i);
+            changeIndivWeathLabel(weatherJSON,getLabels()[i]);
+
+            }
+
+      } catch (JSONException e) {
+         e.printStackTrace();
+      }
+      
+   }
+
+   private void addWeather(JSONArray arr, JPanel toPanel) throws Exception {
+      ImageIcon weatherImg = null;
+      String iconMSG = null;
+      JSONObject weatherJSON = null;
+      String date, high, low, txt;
+      JLabel label = null;
+      try {
+         for (int i = 0; i < arr.length(); i++) {
+            weatherJSON = arr.getJSONObject(i);
+            if((label = queryIndividualWeathLabel(weatherJSON)) != null){
+               toPanel.add(label);
+               addWeatherLabels(label);
+            } else{
+               new Exception("Unable to load the program! x139");
+            }
+
+         }
+      } catch (JSONException e) {
+         e.printStackTrace();
+      }
+   }
+
+   private void createDefaultDisplayUI() throws Exception {
    String[] result = null;
 
       try {
-         setTitle("Weather Tool");
-         setFrameSize(400, 500);
-         setDefaultCloseOperation();
+         this.setTitle("Weather Tool");
+         this.setFrameSize(340, 450);
+         this.setDefaultCloseOperation();
+         this.setResizable(false);
+         this.setLocationRelativeTo(null);
          super.addWindowListener(new JFrameListener());
 
-         JPanel aPanel = new JPanel();
-         aPanel.add(generateLabel("Here are the next 10 days of forecast: "));
-         add(aPanel);
-         result = createWeather();
-         for (int i = 0; i < result.length; i++) {
-            aPanel.add(generateLabel(result[i]));
-            add(aPanel);
-         }
-         setVisible(true);
+         JPanel outterLayer = new JPanel();
+         JPanel weatherPanel = new JPanel();
+         //outterLayer.setLayout(new BoxLayout(outterLayer,BoxLayout.PAGE_AXIS));
+         weatherPanel.setLayout(new BoxLayout(weatherPanel,BoxLayout.PAGE_AXIS));
+         weatherPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 10));
+         addWeather(queryLocalWeather(),weatherPanel);
+         outterLayer.add(weatherPanel);
+
+         //------------------------------------->
+         JPanel buttonRefreshPanel = new JPanel();
+         weatherPanel.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 10));
+
+         JLabel buttonStatus = generateLabel("Have a wonderful day :)");
+         addWeatherLabels(buttonStatus);
+
+         buttonRefreshPanel.add(buttonStatus);
+         JButton refreshButton = new JButton("Refresh");
+         refreshButton.addActionListener(this);
+
+         buttonRefreshPanel.add(refreshButton);
+
+         outterLayer.add(buttonRefreshPanel);
+
+         this.add(outterLayer);
+
+         this.setVisible(true);
       }
       catch (Exception e){
          throw new Exception(e);
@@ -134,6 +328,7 @@ class WeatherInterface extends JFrame{
       }
 
    }
+
 
    public void setFrameSize(int height, int width){
 
@@ -152,11 +347,21 @@ class WeatherInterface extends JFrame{
       super.setVisible(condition);
    }
 
-   public JLabelFactory generateLabel(String labelContent){
+   private JLabelFactory generateLabel(String labelContent){
    JLabelFactory aLabel = null;
 
-      //aLabel = new JLabelFactory( "Testing","images/sunny.png", "sunny icon", JLabelFactory.CENTER);
       aLabel = new JLabelFactory(labelContent);
       return aLabel;
+   }
+
+   @Override
+   public void actionPerformed(ActionEvent e) {
+
+      try {
+         refreshWeatherPanel(queryLocalWeather());
+         labels[10].setText("Refreshed. Have a wonderful day:)");
+      } catch (Exception e1) {
+         e1.printStackTrace();
+      }
    }
 }

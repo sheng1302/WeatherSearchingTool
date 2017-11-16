@@ -124,7 +124,7 @@ class IPHostInfo{
          String[] fild_Request_Message = getREQUEST_MESSAGE();
 
          json = new JSONObject(getResultMes());
-         return json.get(fild_Request_Message[4]).toString();           // 4 means the index of city
+         return json.get(fild_Request_Message[3]).toString();           // 4 means the index of city
       } catch (Exception e){
          throw new Exception(e);
       }
@@ -137,7 +137,7 @@ class IPHostInfo{
          String[] fild_Request_Message = getREQUEST_MESSAGE();
 
          json = new JSONObject(getResultMes());
-         return json.get(fild_Request_Message[4]).toString();           // 4 means the index of city
+         return json.get(fild_Request_Message[2]).toString();           // 4 means the index of state
       }catch (Exception e){
          throw new Exception(e);
       }

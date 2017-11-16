@@ -14,8 +14,6 @@ import java.net.URL;
 class WeatherInfo {
    private String currentGeoLocationCity = null;
    private String currentGeoLocationState = null;
-   private final String[] REQUEST_MESSAGE = {"date","day","high","low","text"};
-   private JSONObject[] jSonList = null;
    private String retMes = null;
 
    WeatherInfo(){
@@ -44,11 +42,12 @@ class WeatherInfo {
       return currentGeoLocationState;
    }
 
-   String[] checkWeatherGeoLocation() throws Exception {
+   JSONArray checkWeatherGeoLocation() throws Exception {
       String geoLocCity = getCurrentGeoLocationCity();
       String geoLocState = getCurrentGeoLocationState();
       String httpURL = "https://query.yahooapis.com/v1/public/yql?q=";
-      String httpYQL = "select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22New%20York%2C%20NY%22)";
+      String httpYQL = "select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20"+
+                       "where%20text%3D%22"+ geoLocCity.replace(" ", "%20") +"%2C%20"+getCurrentGeoLocationState()+"%22)";
       String httpFormat = "&format=json";
       String httpAdd = httpURL + httpYQL + httpFormat;
       HttpURLConnection geoLocConnect = null;
@@ -79,48 +78,23 @@ class WeatherInfo {
       return retMes;
    }
 
-   String[] loadForcast() throws Exception {
+   JSONArray loadForcast() throws Exception {
 
       String retData        =   null;
       JSONObject jSon       =   null;
-      JSONArray jArr        =   null;
-      String[] requestMes   =   null;
-      String[] returnForeCastData      =   null;
-      int forecastSize      =   0;
-
+      JSONArray returnForeCastData = null;
 
       try {
+
          retData        =   getRetMes();
          jSon           =   new JSONObject(retData);
-         returnForeCastData = new String[queryForcast(jSon).length()];
-         forecastSize   =   queryForcast(jSon).length();
-         requestMes     =   getREQUEST_MESSAGE();
-
-
-         for(int i = 0; i < forecastSize; i++){
-            returnForeCastData[i] = "";
-            for(int counter = 0; counter < getREQUEST_MESSAGE().length; counter++){
-
-                returnForeCastData[i] = (returnForeCastData[i] +
-                                        getREQUEST_MESSAGE()[counter] +
-                                        " : " +
-                                        queryForcast(jSon).getJSONObject(i).get(getREQUEST_MESSAGE()[counter]) +
-                                        "  " );
-
-            }
-
-         }
+         returnForeCastData = queryForcast(jSon);  // <- this will parse or cut all useless informtaion, return 10 days of broadcast
 
          return returnForeCastData;
       } catch (Exception e) {
          throw new Exception(e);
       }
 
-   }
-
-   String[] getREQUEST_MESSAGE(){
-
-      return REQUEST_MESSAGE;
    }
 
    JSONArray queryForcast(JSONObject jSon) throws Exception {
