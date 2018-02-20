@@ -26,7 +26,8 @@ class IPHostInfo{
          seekIpLoc();
       }
       catch(IOException e){
-         JOptionPane.showMessageDialog(null,"Exception: " + e.getMessage());
+         JOptionPane.showMessageDialog(null,"Loading Failed: please check your network connection. ");
+         System.exit(0);
       }
 
 
@@ -141,6 +142,26 @@ class IPHostInfo{
       }catch (Exception e){
          throw new Exception(e);
       }
+   }
+
+
+   Integer findMax(int[] list){
+   int smallest = 0, total=0;
+
+      for(int i = 0; i < list.length; i++){
+         if(list[smallest] >= list[i]){
+            smallest = i;     // will not add this lowest one
+         }
+      }
+
+      for(int i = 0; i < list.length; i++){
+         if(smallest != i){
+            
+            total = total + list[i];
+         }
+      }
+
+      return total;
    }
 }
 

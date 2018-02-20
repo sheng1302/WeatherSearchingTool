@@ -29,6 +29,7 @@ class WeatherInfo {
    void setCurrentGeoLocation(String geoLocationCity,String geoLocationState){
 
       currentGeoLocationCity = geoLocationCity;
+      System.out.print(geoLocationCity);
       currentGeoLocationState = geoLocationState;
    }
 

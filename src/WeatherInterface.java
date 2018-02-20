@@ -1,3 +1,4 @@
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -56,13 +56,6 @@ class JFrameListener implements WindowListener{
    }
 }
 
-class JPanelFactory extends JPanel {
-
-   JPanelFactory(){}
-
-
-}
-
 class JLabelFactory extends JLabel{
 
    JLabelFactory(String labelContent){
@@ -70,9 +63,9 @@ class JLabelFactory extends JLabel{
       super(labelContent);
    }
 
-   JLabelFactory(Icon icon){
+   JLabelFactory(String labelContent, Icon icon, int alighnment){
 
-      super(icon);
+      super(labelContent,icon,alighnment);
    }
 
    JLabelFactory(String text,String fileAddress, String description, int horizontalAlignment){
@@ -87,6 +80,7 @@ class WeatherInterface extends JFrame implements ActionListener{
 private int MAX_LABELS = 11;
 private int iterator = 0;
 private JLabel[] labels = new JLabel[MAX_LABELS];
+private JSONObject condition_code= null;
 
    WeatherInterface() throws Exception {
       try {
@@ -97,7 +91,7 @@ private JLabel[] labels = new JLabel[MAX_LABELS];
 
    }
 
-  private JSONArray queryLocalWeather() throws Exception {
+   private JSONArray queryLocalWeather() throws Exception {
    IPHostInfo ipPack = null;
    WeatherInfo weather = null;
    JSONArray retResult = null;
@@ -115,33 +109,59 @@ private JLabel[] labels = new JLabel[MAX_LABELS];
 
    }
 
-   private String translateConditionCode(int code){
+   private String readConditionalCodeFile(){
+      StringBuilder builder = new StringBuilder();
+      String line = null;
+      FileReader conFileReader = null;
 
       try {
-         String line = null;
-         FileReader conFileReader = new FileReader("src/db/conditionCode.txt");
+         conFileReader = new FileReader("src/resources/conditionalCode.json");
          BufferedReader contxt = new BufferedReader(conFileReader);
 
          while((line = contxt.readLine()) != null){
-            String[] wholeLine = line.split("//");
-            if(Integer.parseInt(wholeLine[0]) == code){
-
-               System.out.println(wholeLine[1]);
-               return wholeLine[1];
-            }
+            builder.append(line);
 
          }
-
-
-
-      } catch (FileNotFoundException e) {
-         e.printStackTrace();
       } catch (IOException e) {
          e.printStackTrace();
       }
 
+      return builder.toString();
+   }
 
-      return null;
+   private void setCondition_Code(String content) throws Exception{
+
+
+      if(content != null && !(content.equals(""))){
+         condition_code = new JSONObject(content);
+      } else {
+         throw new Exception("Content Exception; Condition load failed");
+      }
+   }
+
+   private JSONObject getCondition_Code(){
+
+      return condition_code;
+   }
+
+   private String translateConditionCode(int code){
+      JSONObject ao = getCondition_Code();
+      String result = null;
+      try {
+
+         JSONArray newJSON = ao.getJSONObject("weather_codes").optJSONArray("code");
+         if(code == 3200) {
+
+            return newJSON.getJSONObject(48).get("description").toString();
+         }
+
+         result = newJSON.getJSONObject(code).get("description").toString();
+
+      } catch (Exception e){
+         JOptionPane.showMessageDialog(null,"Exception: " + e.getMessage());
+      }
+
+      return result;
    }
 
    private int getIterator(){
@@ -164,18 +184,21 @@ private JLabel[] labels = new JLabel[MAX_LABELS];
       iterator--;
    }
 
-   private void addWeatherLabels(JLabel label){
+   private void addWeatherLabels(JLabel label)throws Exception {
 
       JLabel[] labels = getLabels();
+      try {
+         if (getIterator() < MAX_LABELS) {
 
-      if(getIterator() < MAX_LABELS){
-
-         labels[getIterator()] = label;
-         increaseIterator();
+            labels[getIterator()] = label;
+            increaseIterator();
+         }
+      } catch (Exception e){
+         throw new Exception("Weather Label load failed");
       }
    }
 
-   private JLabel queryIndividualWeathLabel(JSONObject weatherJSON){
+   private JLabel addIndividualWeathLabel(JSONObject weatherJSON)throws Exception{
       ImageIcon weatherImg = null;
       String iconMSG = null;
       String date, high, low, txt;
@@ -186,28 +209,30 @@ private JLabel[] labels = new JLabel[MAX_LABELS];
          conCode = Integer.parseInt(weatherJSON.getString("code"));
 
          if ((iconMSG = translateConditionCode(conCode)) != null) {
-            weatherImg = new ImageIcon("src/images/widget_" + iconMSG + ".png");
+            //System.out.println(iconMSG);
+            weatherImg = new ImageIcon("src/resources/widget_" + iconMSG + ".png");
 
          } else {
-            new Exception("Error! Unable to load icon! x140");
+            new Exception("Error! Unable to load icon! ");
          }
 
 
          date = weatherJSON.getString("date");
          high = weatherJSON.getString("high");
-         low = weatherJSON.getString("high");
+         low = weatherJSON.getString("low");
          txt = weatherJSON.getString("text");
 
-         label = new JLabel(date + " | High:" + high + " | low: " + low + " | " + txt, weatherImg, JLabel.LEFT);
+         label = generateLabel(date + " | High:" + high + " | low: " + low + " | " + txt,weatherImg,JLabel.LEFT);
+
          return label;
       }catch (JSONException e) {
-         e.printStackTrace();
+         JOptionPane.showMessageDialog(null, " Parsing failure. Try again later!" );
       }
 
       return null;
    }
 
-   private void changeIndivWeathLabel(JSONObject weatherJSON,JLabel label){
+   private void changeIndivWeathLabel(JSONObject weatherJSON,JLabel label) throws Exception{
       ImageIcon weatherImg = null;
       String iconMSG = null;
       String date, high, low, txt;
@@ -217,7 +242,7 @@ private JLabel[] labels = new JLabel[MAX_LABELS];
          conCode = Integer.parseInt(weatherJSON.getString("code"));
 
          if ((iconMSG = translateConditionCode(conCode)) != null) {
-            weatherImg = new ImageIcon("src/images/widget_" + iconMSG + ".png");
+            weatherImg = new ImageIcon("src/resources/widget_" + iconMSG + ".png");
 
          } else {
             new Exception("Error! Unable to load icon! x140");
@@ -226,17 +251,17 @@ private JLabel[] labels = new JLabel[MAX_LABELS];
 
          date = weatherJSON.getString("date");
          high = weatherJSON.getString("high");
-         low = weatherJSON.getString("high");
+         low = weatherJSON.getString("low");
          txt = weatherJSON.getString("text");
 
          label.setText(date + " | High:" + high + " | low: " + low + " | " + txt);
 
       }catch (JSONException e) {
-         e.printStackTrace();
+         JOptionPane.showMessageDialog(null,"Parse failure. Try again later! x00000001" );
       }
    }
 
-   private void refreshWeatherPanel(JSONArray arr){
+   private void refreshWeatherPanel(JSONArray arr) throws Exception{
       ImageIcon weatherImg = null;
       String iconMSG = null;
       JSONObject weatherJSON = null;
@@ -250,30 +275,29 @@ private JLabel[] labels = new JLabel[MAX_LABELS];
             }
 
       } catch (JSONException e) {
-         e.printStackTrace();
+         JOptionPane.showMessageDialog(null,"Parse failure. Try again later!");
       }
       
    }
 
    private void addWeather(JSONArray arr, JPanel toPanel) throws Exception {
-      ImageIcon weatherImg = null;
-      String iconMSG = null;
       JSONObject weatherJSON = null;
-      String date, high, low, txt;
       JLabel label = null;
+
       try {
          for (int i = 0; i < arr.length(); i++) {
             weatherJSON = arr.getJSONObject(i);
-            if((label = queryIndividualWeathLabel(weatherJSON)) != null){
+            if((label = addIndividualWeathLabel(weatherJSON)) != null){
                toPanel.add(label);
                addWeatherLabels(label);
             } else{
-               new Exception("Unable to load the program! x139");
+               JOptionPane.showMessageDialog(null,"Unable to load the program!");
+               System.exit(0);
             }
 
          }
       } catch (JSONException e) {
-         e.printStackTrace();
+         JOptionPane.showMessageDialog(null,"Parse failure. Try again later!");
       }
    }
 
@@ -290,9 +314,10 @@ private JLabel[] labels = new JLabel[MAX_LABELS];
 
          JPanel outterLayer = new JPanel();
          JPanel weatherPanel = new JPanel();
-         //outterLayer.setLayout(new BoxLayout(outterLayer,BoxLayout.PAGE_AXIS));
+
          weatherPanel.setLayout(new BoxLayout(weatherPanel,BoxLayout.PAGE_AXIS));
          weatherPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 10));
+         setCondition_Code(readConditionalCodeFile());
          addWeather(queryLocalWeather(),weatherPanel);
          outterLayer.add(weatherPanel);
 
@@ -332,8 +357,13 @@ private JLabel[] labels = new JLabel[MAX_LABELS];
 
    public void setFrameSize(int height, int width){
 
-      if((height > 0) && (width>0)){
-         super.setSize(new Dimension(width,height));
+      try {
+         if ((height > 0) && (width > 0)) {
+            super.setSize(new Dimension(width, height));
+         }
+      } catch(Exception e){
+         JOptionPane.showMessageDialog(null,"Unable to create frame. ");
+         System.exit(0);
       }
    }
 
@@ -354,6 +384,13 @@ private JLabel[] labels = new JLabel[MAX_LABELS];
       return aLabel;
    }
 
+   private JLabelFactory generateLabel(String labelContent, ImageIcon img, int ali){
+      JLabelFactory aLabel = null;
+
+      aLabel = new JLabelFactory(labelContent,img,ali);
+      return aLabel;
+   }
+
    @Override
    public void actionPerformed(ActionEvent e) {
 
@@ -361,7 +398,7 @@ private JLabel[] labels = new JLabel[MAX_LABELS];
          refreshWeatherPanel(queryLocalWeather());
          labels[10].setText("Refreshed. Have a wonderful day:)");
       } catch (Exception e1) {
-         e1.printStackTrace();
+         JOptionPane.showMessageDialog(null,e1);
       }
    }
 }
