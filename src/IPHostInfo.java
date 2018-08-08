@@ -14,16 +14,22 @@ import java.net.UnknownHostException;
 
 
 class IPHostInfo{
+   private String            ACESS_KEY       = "95ccd20c1539944ef846f6b2dce0cd55";
    private InetAddress       IpHost          = null;
    private String            resultMes       = null;
    private final String[]    REQUEST_MESSAGE = {"ip","country_name","region_code","region_name","city","zip_code"};
 
-   IPHostInfo() throws UnknownHostException{
-      boolean setStatus = false;
+   IPHostInfo() throws Exception {
+      boolean status = false;
 
       try {
-         setStatus = setIpHost();
-         seekIpLoc();
+         status = setIpHost();
+         if(status == true){
+            doGetRequest();
+         } else{
+            throw new Exception("Failed to set Ip Host");
+         }
+
       }
       catch(IOException e){
          JOptionPane.showMessageDialog(null,"Loading Failed: please check your network connection. ");
@@ -58,19 +64,27 @@ class IPHostInfo{
       System.out.println(message);
    }
 
-   private void seekIpLoc() throws IOException {
+   private String getACESS_KEY(){
+
+      return this.ACESS_KEY;
+   }
+
+   private void doGetRequest() throws IOException {
       BufferedReader reader = null;
 
       try {
          //String httpAdd = "http://tools.keycdn.com/geo.json?host={" + IpHost.getHostAddress() + "}";
-         String httpAdd = "http://freegeoip.net/json/";// + IpHost.getHostAddress();
+         //http://api.ipstack.com/95ccd20c1539944ef846f6b2dce0cd55
+         String param = "check?access_key=" + getACESS_KEY();
+         String httpAdd = "http://api.ipstack.com/" + param;// + IpHost.getHostAddress();
+
          URL url = new URL(httpAdd);
          HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
          connection.setRequestMethod("GET");
+
          reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-         //System.out.println(reader.readLine());
-         setResult(reader);
+         setResult(reader.readLine());
 
       }
       catch (IOException e) {
@@ -80,18 +94,23 @@ class IPHostInfo{
 
    }
 
-   private void setResult(BufferedReader finalMes) throws IOException {
-      String str = null;
+   private boolean setResult(String finalMes) throws IOException {
+      //String str = null;
 
-      try {
-         resultMes  = new String();
-         while ((str = finalMes.readLine()) != null) {
-            resultMes = resultMes + str;
-         }
+      //str  = new String();
+         /*while ((str = finalMes.readLine()) != null) {
+            this.resultMes = this.resultMes + str;
+         }*/
 
-      }catch (IOException e){
-         throw new IOException("result can not be set : " + e.getMessage());
+      System.out.println(finalMes );
+      if(!finalMes.isEmpty()){
+         this.resultMes = finalMes;
+         return true;
+      }else{
+         return false;
       }
+
+
    }
 
    String getResultMes(){
@@ -121,11 +140,14 @@ class IPHostInfo{
    String getCity() throws Exception {
       JSONObject json = null;
 
+      System.out.print(getREQUEST_MESSAGE()[4]);
       try {
          String[] fild_Request_Message = getREQUEST_MESSAGE();
 
          json = new JSONObject(getResultMes());
-         return json.get(fild_Request_Message[3]).toString();           // 4 means the index of city
+
+         System.out.print(json.get(fild_Request_Message[4]) .toString());
+         return json.get(fild_Request_Message[4]) .toString();          // 4 means the index of city
       } catch (Exception e){
          throw new Exception(e);
       }
@@ -134,10 +156,12 @@ class IPHostInfo{
    String getState() throws Exception {
       JSONObject json = null;
 
+      System.out.print(getREQUEST_MESSAGE()[2]);
       try {
          String[] fild_Request_Message = getREQUEST_MESSAGE();
 
          json = new JSONObject(getResultMes());
+         System.out.print(json.get(fild_Request_Message[2]).toString());
          return json.get(fild_Request_Message[2]).toString();           // 4 means the index of state
       }catch (Exception e){
          throw new Exception(e);

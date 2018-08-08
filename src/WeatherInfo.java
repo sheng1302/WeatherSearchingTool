@@ -27,7 +27,6 @@ class WeatherInfo {
    }
 
    void setCurrentGeoLocation(String geoLocationCity,String geoLocationState){
-
       currentGeoLocationCity = geoLocationCity;
       System.out.print(geoLocationCity);
       currentGeoLocationState = geoLocationState;
@@ -89,8 +88,9 @@ class WeatherInfo {
 
          retData        =   getRetMes();
          jSon           =   new JSONObject(retData);
+         System.out.print("WeatherInfo checked 0x1");
          returnForeCastData = queryForcast(jSon);  // <- this will parse or cut all useless informtaion, return 10 days of broadcast
-
+         System.out.print("WeatherInfo checked 0x2");
          return returnForeCastData;
       } catch (Exception e) {
          throw new Exception(e);

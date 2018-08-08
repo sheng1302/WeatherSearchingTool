@@ -11,7 +11,7 @@ public class WeatherCheckingTool {
       try {
          WeatherInterface weatherUI = new WeatherInterface();
       } catch (Exception e) {
-         JOptionPane.showMessageDialog(null,"Unexpected Exception Occurred.");
+         JOptionPane.showMessageDialog(null,"Unexpected Exception Occurred." + e);
       }
    }
 }

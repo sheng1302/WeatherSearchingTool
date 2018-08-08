@@ -99,8 +99,9 @@ private JSONObject condition_code= null;
       try {
          ipPack = new IPHostInfo();
          weather = new WeatherInfo(ipPack.getCity(),ipPack.getState());
+         System.out.println("checked! 0x1");
          retResult = weather.checkWeatherGeoLocation();
-
+         System.out.println("checked! 0x2");
          return retResult;
       }
         catch (Exception e){
